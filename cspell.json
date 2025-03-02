@@ -1,0 +1,12 @@
+{
+    "language": "en",
+    "words": [
+      "songkeys",
+      "THROTLLER",
+      "metatype",
+      "presigner"
+    ],
+    "flagWords": [],
+    "ignorePaths": ["node_modules/**", "src/**/databases/migrations/**"]
+  }
+  
