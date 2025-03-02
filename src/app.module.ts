@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { ChannelModule } from '~certificates/certificates.module';
 
 @Module({
-  imports: [],
+  imports: [ChannelModule],
   controllers: [AppController],
   providers: [],
 })
