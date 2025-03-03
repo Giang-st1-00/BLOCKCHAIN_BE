@@ -7,7 +7,7 @@ export class CertificateService {
   private web3: Web3;
   private contract: any;
   private account: string;
-  private contractAddress = '0x5416e367FbA90B0f3E05b4e20Abef8F344B240c2';
+  private contractAddress = '0x97306a85c2E7A19D142bF05c7A4eAd6C3b7161d0';
 
   constructor() {
     this.web3 = new Web3('https://sepolia.infura.io/v3/812754277e27452c8f2c54cb66358e28'); // Thay bằng RPC phù hợp
@@ -33,14 +33,41 @@ export class CertificateService {
       gas,
       gasPrice,
     };
-
+    
     const signedTx = await this.web3.eth.accounts.signTransaction(txData, '0xcca4935388fae921b972f829342d65f7680862577431663ca404189dc5923cd7');
     const receipt = await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction);
     
-    return receipt.transactionHash;
+    console.log(receipt.logs);
+  
+    let certId: string | null = null;
+    if (receipt.logs && receipt.logs.length > 0) {
+      const eventLog = receipt.logs.find(log => log?.address?.toLowerCase() === this.contractAddress.toLowerCase());
+      if (eventLog && eventLog.data) {
+        // Chuyển đổi Bytes -> Hex trước khi giải mã
+        const hexData = this.web3.utils.bytesToHex(eventLog.data);
+        certId = this.web3.eth.abi.decodeParameter('string', hexData) as string;
+      }
+    }
+  
+    // 🔥 Convert BigInt to string before returning
+    return {
+      certId,
+      transactionHash: receipt.transactionHash,
+      gasUsed: receipt.gasUsed.toString(),  // Convert BigInt to string
+      cumulativeGasUsed: receipt.cumulativeGasUsed.toString(), // Convert BigInt
+    };
   }
-
+  
   async verifyCertificate(certId: string) {
-    return await this.contract.methods.verifyCertificate(certId).call();
+    const result = await this.contract.methods.verifyCertificate(certId).call();
+  
+    // 🔥 Convert all BigInt values to string
+    const parsedResult = JSON.parse(
+      JSON.stringify(result, (_, value) =>
+        typeof value === 'bigint' ? value.toString() : value
+      )
+    );
+  
+    return parsedResult;
   }
 }
