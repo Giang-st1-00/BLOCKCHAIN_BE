@@ -10,6 +10,9 @@ import { UserEntity } from '~users/entities/user.entity';
 import { CreateUserDto } from '~users/http/dto/create-user.dto';
 import { UserResponse } from '~users/http/responses/user.response';
 import { SuccessResponse } from '~core/http/responses/success.response';
+import { v4 as uuidv4 } from 'uuid';
+import Web3 from 'web3';
+import { UserRoleEnum } from '~users/enums/user-role.enum';
 
 @Injectable()
 export class UserService {
@@ -17,6 +20,21 @@ export class UserService {
         @InjectRepository(UserEntity)
         private readonly userRepo: Repository<UserEntity>
     ) {}
+    
+    create(entity: DeepPartial<UserEntity>, options?: SaveOptions): Promise<UserEntity> {
+        // Tạo Web3 instance (không cần kết nối node để tạo ví)
+        if (entity.role == UserRoleEnum.TEACHER) {
+            const web3 = new Web3();
+
+            // Tạo ví mới
+            const account = web3.eth.accounts.create();
+            entity.walletAddress = account.address;
+            entity.walletPrivateKey = account.privateKey;
+        }
+       
+
+        return this.userRepo.save(entity, options);
+    }
 
     save(entity: DeepPartial<UserEntity>, options?: SaveOptions): Promise<UserEntity> {
         return this.userRepo.save(entity, options);
@@ -50,13 +68,13 @@ export class UserService {
 
 
     async update(idUser: string, updateBlogDto: CreateUserDto): Promise<SuccessResponse> {
-        const blog = await this.findOneOrFail({
+        const user = await this.findOneOrFail({
             where: {
                 id: idUser
             }
         });
 
-        if (!blog) {
+        if (!user) {
             throw new NotFoundException('User not found');
         }
 

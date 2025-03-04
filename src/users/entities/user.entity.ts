@@ -7,6 +7,7 @@ import { CertificateEntity } from '~certificates/entities/certificate.entity';
 
 @Entity('User')
 export class UserEntity extends BaseEntity {
+    @Unique('codeUserUnique', ['code'])
     @Column({
         type: 'varchar',
     })
@@ -39,7 +40,13 @@ export class UserEntity extends BaseEntity {
         type: 'varchar',
         nullable: true, 
     })
-    walletId: string;
+    walletAddress: string;
+
+    @Column({
+        type: 'varchar',
+        nullable: true, 
+    })
+    walletPrivateKey: string;
 
     @OneToMany(() => UserCertificateEntity, (userCertificate) => userCertificate.user)
     userCertificates: UserCertificateEntity[];

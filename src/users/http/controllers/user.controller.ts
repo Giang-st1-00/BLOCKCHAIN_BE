@@ -23,7 +23,8 @@ export class UserController {
     @ApiOkResponse({ type: UserResponse })
     @HttpCode(HttpStatus.CREATED)
     create(@Body() createUserDto: CreateUserDto): Promise<UserResponse> {
-        return this.userService.save(createUserDto)
+        
+        return this.userService.create(createUserDto)
     }
 
     @Put(':id')
