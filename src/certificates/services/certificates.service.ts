@@ -7,7 +7,7 @@ export class CertificateService {
   private web3: Web3;
   private contract: any;
   private account: string;
-  private contractAddress = '0x97306a85c2E7A19D142bF05c7A4eAd6C3b7161d0';
+  private contractAddress = '0x1314Ca0B21d2c25615e32aC54a584d7C5CF86046';
 
   constructor() {
     this.web3 = new Web3('https://sepolia.infura.io/v3/812754277e27452c8f2c54cb66358e28'); // Thay bằng RPC phù hợp

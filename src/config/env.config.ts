@@ -10,4 +10,12 @@ export const env = {
     CORS: {
         ALLOWED_ORIGINS: (process.env.ALLOWED_ORIGINS || '*').split(',')
     },
+    DATABASE: {
+        CONNECT: process.env.DATABASE_CONNECT as any,
+        HOST: process.env.DATABASE_HOST,
+        PORT: Number(process.env.DATABASE_PORT),
+        USER: process.env.DATABASE_USER,
+        PASSWORD: process.env.DATABASE_PASSWORD,
+        NAME: process.env.DATABASE_NAME,
+    },
 };
