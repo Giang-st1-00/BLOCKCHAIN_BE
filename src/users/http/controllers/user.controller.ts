@@ -11,11 +11,11 @@ export class UserController {
     constructor(private readonly userService: UserService) {}
 
     @Get()
-    @ApiOperation({ description: `Get a user's profile` })
+    @ApiOperation({ description: `Get a user's profile by Code` })
     @ApiOkResponse({ type: UserResponse })
     @HttpCode(HttpStatus.OK)
-    getDetail(@Param('id') userId: string): Promise<UserResponse | null> {
-        return this.userService.findById(userId);
+    getDetail(@Param('code') code: string): Promise<UserResponse | null> {
+        return this.userService.findByCode(code);
     }
 
     @Post()

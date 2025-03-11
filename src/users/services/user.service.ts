@@ -5,12 +5,9 @@ import { SaveOptions } from 'typeorm/repository/SaveOptions';
 import { DeepPartial } from 'typeorm/common/DeepPartial';
 import { FindManyOptions } from 'typeorm/find-options/FindManyOptions';
 import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
-import dayjs from 'dayjs';
 import { UserEntity } from '~users/entities/user.entity';
 import { CreateUserDto } from '~users/http/dto/create-user.dto';
-import { UserResponse } from '~users/http/responses/user.response';
 import { SuccessResponse } from '~core/http/responses/success.response';
-import { v4 as uuidv4 } from 'uuid';
 import Web3 from 'web3';
 import { UserRoleEnum } from '~users/enums/user-role.enum';
 
@@ -55,6 +52,14 @@ export class UserService {
         return this.userRepo.findOneBy({
             id: userId,
             ...where
+        });
+    }
+
+    findByCode(
+        code: string,
+    ): Promise<UserEntity | null> {
+        return this.userRepo.findOneBy({
+            code
         });
     }
 
