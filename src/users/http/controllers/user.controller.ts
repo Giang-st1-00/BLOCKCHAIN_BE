@@ -4,6 +4,7 @@ import { UserService } from '~users/services/user.service';
 import { UserResponse } from '../responses/user.response';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { SuccessResponse } from '~core/http/responses/success.response';
+import { UserRoleEnum } from '~users/enums/user-role.enum';
 
 @Controller('users')
 @ApiTags('Users')
@@ -16,6 +17,22 @@ export class UserController {
     @HttpCode(HttpStatus.OK)
     getDetail(@Param('code') code: string): Promise<UserResponse | null> {
         return this.userService.findByCode(code);
+    }
+
+    @Get('/all')
+    @ApiOperation({ description: `Get all users` })
+    @ApiOkResponse({ type: UserResponse, isArray: true })
+    @HttpCode(HttpStatus.OK)
+    getAll(): Promise<UserResponse[]> {
+        return this.userService.getAll();
+    }
+
+    @Get('/role')
+    @ApiOperation({ description: `Get user by role` })
+    @ApiOkResponse({ type: UserResponse, isArray: true })
+    @HttpCode(HttpStatus.OK)
+    getByRole(@Param('role') role: UserRoleEnum): Promise<UserResponse[]> {
+        return this.userService.getByRole(role);
     }
 
     @Post()

@@ -71,6 +71,17 @@ export class UserService {
         return { message: 'Blog deleted successfully' };
     }
 
+    async getAll(): Promise<UserEntity[]> {
+        return this.userRepo.find();
+    }
+
+    async getByRole(role: UserRoleEnum): Promise<UserEntity[]> {
+        return this.userRepo.find({
+            where: {
+                role
+            }
+        });
+    }
 
     async update(idUser: string, updateBlogDto: CreateUserDto): Promise<SuccessResponse> {
         const user = await this.findOneOrFail({
