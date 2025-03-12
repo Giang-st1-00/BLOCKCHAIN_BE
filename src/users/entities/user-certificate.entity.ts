@@ -2,6 +2,7 @@ import { BaseEntity } from '~core/entities/base.entity';
 import { Column, Index, JoinColumn, ManyToOne, Entity } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { CertificateEntity } from '~certificates/entities/certificate.entity';
+import { CertificateStatusEnum } from '~certificates/enums/certificateStatus.enum';
 
 @Entity('UserCetificate')
 export class UserCertificateEntity extends BaseEntity {

@@ -63,6 +63,11 @@ export class UserService {
         });
     }
 
+    async getAll(): Promise<UserEntity[] | null> {
+        const users = await this.userRepo.find();
+        return users;
+    }
+
     async delete(idUser: string): Promise<SuccessResponse> {
         await this.userRepo.delete({
             id: idUser
@@ -71,9 +76,7 @@ export class UserService {
         return { message: 'Blog deleted successfully' };
     }
 
-    async getAll(): Promise<UserEntity[]> {
-        return this.userRepo.find();
-    }
+  
 
     async getByRole(role: UserRoleEnum): Promise<UserEntity[]> {
         return this.userRepo.find({

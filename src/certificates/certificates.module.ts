@@ -5,9 +5,11 @@ import { Module } from '@nestjs/common';
 import { CertificateEntity } from "./entities/certificate.entity";
 import { UserEntity } from "~users/entities/user.entity";
 import { UserService } from "~users/services/user.service";
+import { CertificateTypeEntity } from "./entities/certificate-type.entity";
+import { UserCertificateEntity } from "~users/entities/user-certificate.entity";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([CertificateEntity, UserEntity])],
+    imports: [TypeOrmModule.forFeature([CertificateEntity, UserEntity, CertificateTypeEntity, UserCertificateEntity])],
     controllers: [CertificateController],
     providers: [CertificateService, UserService],
     exports: []

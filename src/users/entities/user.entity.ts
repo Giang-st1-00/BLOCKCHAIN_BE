@@ -53,7 +53,7 @@ export class UserEntity extends BaseEntity {
 
     @ManyToMany(() => CertificateEntity, (certificate) => certificate.users)
     @JoinTable({
-        name: 'UserCertificate',
+        name: 'UserCetificate',
         synchronize: false
     })
     certificates: CertificateEntity[];

@@ -3,9 +3,15 @@ import Web3 from 'web3';
 import contractAbi from './abis/CertificateContract.json';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '~users/entities/user.entity';
-import { Repository } from 'typeorm';
+import { DataSource, DeepPartial, DeleteResult, In, Repository, SaveOptions } from 'typeorm';
 import { UserService } from '~users/services/user.service';
 import { CertificateEntity } from '~certificates/entities/certificate.entity';
+import { CertificateTypeEntity } from '~certificates/entities/certificate-type.entity';
+import { SuccessResponse } from '~core/http/responses/success.response';
+import { CreateCertificateDto } from './https/dto/create-certificate.dto';
+import { UserCertificateEntity } from '~users/entities/user-certificate.entity';
+import { CertificateResponse } from './https/responses/certificate.response';
+import { UserRoleEnum } from '~users/enums/user-role.enum';
 
 @Injectable()
 export class CertificateService {
@@ -15,71 +21,77 @@ export class CertificateService {
 
   constructor(
     private readonly userService: UserService,
+    private readonly dataSource: DataSource,
     @InjectRepository(CertificateEntity)
     private readonly certificateRepo: Repository<CertificateEntity>,
+    @InjectRepository(CertificateTypeEntity)
+    private readonly certificateTypeRepo: Repository<CertificateTypeEntity>,
+    @InjectRepository(UserCertificateEntity)
+    private readonly userCertificateRepo: Repository<UserCertificateEntity>,
+    @InjectRepository(UserEntity) 
+    private readonly userRepo: Repository<UserEntity>,
   ) {
     this.web3 = new Web3('https://sepolia.infura.io/v3/812754277e27452c8f2c54cb66358e28'); // Thay bằng RPC phù hợp
     this.contract = new this.web3.eth.Contract(contractAbi, this.contractAddress);
   }
 
-  async issueCertificate(userId: string, name: string, score: number, recipient: string) {
-    const user = await this.userService.findOne({ where: { id: userId } });
+  // async issueCertificate(userId: string, name: string, recipient: string) {
+  //   const user = await this.userService.findOne({ where: { id: userId } });
 
-    if (!user) {
-      throw new Error('User not found');
-    }
+  //   if (!user) {
+  //     throw new Error('User not found');
+  //   }
 
-    await this.certificateRepo.save({
-      name,
-      score,
-      recipient,
-    });
+  //   await this.certificateRepo.save({
+      
+  //     recipient,
+  //   });
 
-    const account = user.walletAddress;
-    const privateKey = user.walletPrivateKey.startsWith('0x') 
-    ? user.walletPrivateKey 
-    : '0x' + user.walletPrivateKey;
+  //   const account = user.walletAddress;
+  //   const privateKey = user.walletPrivateKey.startsWith('0x') 
+  //   ? user.walletPrivateKey 
+  //   : '0x' + user.walletPrivateKey;
 
-    if (!account || !privateKey) {
-      throw new Error('User account or private key is missing');
-    }
+  //   if (!account || !privateKey) {
+  //     throw new Error('User account or private key is missing');
+  //   }
 
-    this.web3.eth.accounts.wallet.add(privateKey);
+  //   this.web3.eth.accounts.wallet.add(privateKey);
 
-    const tx = this.contract.methods.issueCertificate(name, score, recipient);
+  //   const tx = this.contract.methods.issueCertificate(name, recipient);
 
-    const gas = await tx.estimateGas({ from: account });
-    const gasPrice = await this.web3.eth.getGasPrice();
+  //   const gas = await tx.estimateGas({ from: account });
+  //   const gasPrice = await this.web3.eth.getGasPrice();
 
-    const txData = {
-      from: account,
-      to: this.contractAddress,
-      data: tx.encodeABI(),
-      gas,
-      gasPrice,
-    };
+  //   const txData = {
+  //     from: account,
+  //     to: this.contractAddress,
+  //     data: tx.encodeABI(),
+  //     gas,
+  //     gasPrice,
+  //   };
 
-    const signedTx = await this.web3.eth.accounts.signTransaction(txData, privateKey);
-    const receipt = await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+  //   const signedTx = await this.web3.eth.accounts.signTransaction(txData, privateKey);
+  //   const receipt = await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
-    console.log(receipt.logs);
+  //   console.log(receipt.logs);
 
-    let certId: string | null = null;
-    if (receipt.logs && receipt.logs.length > 0) {
-      const eventLog = receipt.logs.find(log => log?.address?.toLowerCase() === this.contractAddress.toLowerCase());
-      if (eventLog && eventLog.data) {
-        const hexData = this.web3.utils.bytesToHex(eventLog.data);
-        certId = this.web3.eth.abi.decodeParameter('string', hexData) as string;
-      }
-    }
+  //   let certId: string | null = null;
+  //   if (receipt.logs && receipt.logs.length > 0) {
+  //     const eventLog = receipt.logs.find(log => log?.address?.toLowerCase() === this.contractAddress.toLowerCase());
+  //     if (eventLog && eventLog.data) {
+  //       const hexData = this.web3.utils.bytesToHex(eventLog.data);
+  //       certId = this.web3.eth.abi.decodeParameter('string', hexData) as string;
+  //     }
+  //   }
 
-    return {
-      certId,
-      transactionHash: receipt.transactionHash,
-      gasUsed: receipt.gasUsed.toString(),
-      cumulativeGasUsed: receipt.cumulativeGasUsed.toString(),
-    };
-  }
+  //   return {
+  //     certId,
+  //     transactionHash: receipt.transactionHash,
+  //     gasUsed: receipt.gasUsed.toString(),
+  //     cumulativeGasUsed: receipt.cumulativeGasUsed.toString(),
+  //   };
+  // }
 
   async verifyCertificate(certId: string) {
     const result = await this.contract.methods.verifyCertificate(certId).call();
@@ -92,5 +104,91 @@ export class CertificateService {
     );
 
     return parsedResult;
+  }
+
+  async createCertificate(teacherId: string, dto: CreateCertificateDto): Promise<CertificateEntity> {
+    const { userId, ...certificateData } = dto;
+    
+    const certificateType = await this.certificateTypeRepo.findOne({ where: { id: certificateData.certificateTypeId } });
+    if (!certificateType) {
+        throw new Error('Certificate type not found');
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+        // Lưu certificate trước
+        const certificate = await queryRunner.manager.save(CertificateEntity, certificateData);
+
+        // Lưu vào bảng trung gian UserCetificate
+        await queryRunner.manager.save(UserCertificateEntity, {
+          userId,
+          certificateId: certificate.id,
+        });
+          await queryRunner.manager.save(UserCertificateEntity, {
+            userId: teacherId,
+            certificateId: certificate.id,
+        });
+
+
+
+        await queryRunner.commitTransaction();
+        return certificate;
+    } catch (error) {
+        await queryRunner.rollbackTransaction();
+        throw error;
+    } finally {
+        await queryRunner.release();
+    }
+  }
+
+  async getCertificateByTeacherId(teacherId: string): Promise<any[]> {
+    // Tìm danh sách chứng chỉ liên quan đến giáo viên
+    const userCertificates = await this.userCertificateRepo.find({
+        where: { userId: teacherId },
+    });
+
+    if (!userCertificates.length) {
+        return [];
+    }
+
+    // Lấy danh sách certificateId
+    const certificateIds = userCertificates.map((uc) => uc.certificateId);
+
+    // Tìm tất cả UserCertificateEntity có cùng certificateId
+    const studentCertificates = await this.userCertificateRepo.find({
+        where: { certificateId: In(certificateIds) }, // TypeORM In()
+    });
+
+    // Lấy thông tin học viên
+    const students = await Promise.all(
+        studentCertificates.map(async (sc) => {
+            const studentInfo = await this.userRepo.findOne({
+                where: { id: sc.userId, role: UserRoleEnum.STUDENT },
+            });
+            return studentInfo ? { ...sc, studentInfo } : null;
+        })
+    );
+
+    // Lọc bỏ null
+    return students.filter(Boolean);
+}
+
+
+
+  async getAllCertificateType() {
+    return this.certificateTypeRepo.find();
+  }
+
+  createCertificateType(entity: DeepPartial<CertificateTypeEntity>, options?: SaveOptions): Promise<CertificateTypeEntity> {
+      return this.certificateTypeRepo.save(entity, options);
+  }
+
+  async deleteCertificateType(id: string): Promise<SuccessResponse> {
+      await this.certificateTypeRepo.delete(id);
+
+      return { message: 'Blog deleted successfully' }
   }
 }

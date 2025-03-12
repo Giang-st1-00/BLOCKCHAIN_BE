@@ -11,7 +11,15 @@ import { UserRoleEnum } from '~users/enums/user-role.enum';
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @Get()
+    @Get('all')
+    @ApiOperation({ description: `Get all users` })
+    @ApiOkResponse({ type: UserResponse, isArray: true })
+    @HttpCode(HttpStatus.OK)
+    getAll(): Promise<UserResponse[] | null> {
+        return this.userService.getAll();
+    }
+
+    @Get('code/:code')
     @ApiOperation({ description: `Get a user's profile by Code` })
     @ApiOkResponse({ type: UserResponse })
     @HttpCode(HttpStatus.OK)
@@ -19,15 +27,9 @@ export class UserController {
         return this.userService.findByCode(code);
     }
 
-    @Get('/all')
-    @ApiOperation({ description: `Get all users` })
-    @ApiOkResponse({ type: UserResponse, isArray: true })
-    @HttpCode(HttpStatus.OK)
-    getAll(): Promise<UserResponse[]> {
-        return this.userService.getAll();
-    }
+    
 
-    @Get('/role')
+    @Get('role/:role')
     @ApiOperation({ description: `Get user by role` })
     @ApiOkResponse({ type: UserResponse, isArray: true })
     @HttpCode(HttpStatus.OK)
