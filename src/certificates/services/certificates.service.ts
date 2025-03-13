@@ -195,9 +195,10 @@ export class CertificateService {
     const students = await Promise.all(
         studentCertificates.map(async (sc) => {
             const studentInfo = await this.userRepo.findOne({
-                where: { id: sc.userId, role: UserRoleEnum.STUDENT },
+                where: { id: sc.userId, role: UserRoleEnum.TEACHER },
             });
-            return studentInfo ? { ...sc, studentInfo } : null;
+            const certificate = await this.certificateRepo.findOne({  where: { id: sc.certificateId } });
+            return studentInfo ? { certificate, studentInfo } : null;
         })
     );
 
@@ -239,19 +240,25 @@ async getStudentByType(certificateTypeId: string): Promise<any> {
     where: { certificateTypeId: certificateTypeId },
   });
 
+  const certificateIds = certificates.map((c) => c.id);
 
-  const certificateIds = certificates.map((uc) => uc.id);
-
-  const studentIds = await this.userCertificateRepo.find({
+  const userCertificates = await this.userCertificateRepo.find({
     where: { certificateId: In(certificateIds) },
   });
 
-  const studentInfo = await this.userRepo.find({
-    where: { id: In(studentIds.map((s) => s.userId)), role: UserRoleEnum.STUDENT },
+  const students = await this.userRepo.find({
+    where: { id: In(userCertificates.map((uc) => uc.userId)), role: UserRoleEnum.STUDENT },
   });
 
-  return studentInfo;
+  return students.map((student) => {
+    const userCertificate = userCertificates.find((uc) => uc.userId === student.id);
+    const certificate = certificates.find((c) => c.id === userCertificate?.certificateId);
+    
+    return { ...student, certificate };
+  });
 }
+
+
 
 
 
