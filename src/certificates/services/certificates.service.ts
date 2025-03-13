@@ -3,7 +3,7 @@ import Web3 from 'web3';
 import contractAbi from './abis/CertificateContract.json';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '~users/entities/user.entity';
-import { DataSource, DeepPartial, DeleteResult, In, Repository, SaveOptions } from 'typeorm';
+import { DataSource, DeepPartial, DeleteResult, In, Not, Repository, SaveOptions } from 'typeorm';
 import { UserService } from '~users/services/user.service';
 import { CertificateEntity } from '~certificates/entities/certificate.entity';
 import { CertificateTypeEntity } from '~certificates/entities/certificate-type.entity';
@@ -199,20 +199,27 @@ export class CertificateService {
     const certificateIds = userCertificates.map((uc) => uc.certificateId);
 
     // Tìm tất cả UserCertificateEntity có cùng certificateId
-    const studentCertificates = await this.userCertificateRepo.find({
+    const teacherCertificates = await this.userCertificateRepo.find({
         where: { certificateId: In(certificateIds) }, // TypeORM In()
     });
 
     // Lấy thông tin học viên
     const students = await Promise.all(
-        studentCertificates.map(async (sc) => {
-            const studentInfo = await this.userRepo.findOne({
+      teacherCertificates.map(async (sc) => {
+            const teacherInfo = await this.userRepo.findOne({
                 where: { id: sc.userId, role: UserRoleEnum.TEACHER },
             });
+            console.log(teacherInfo);
+            
             const certificate = await this.certificateRepo.findOne({  where: { id: sc.certificateId } });
+            const studentTemp:any = await this.userCertificateRepo.findOne({ where: { certificateId: sc.certificateId, userId: Not(sc.userId) } });
+            const student  = await this.userRepo.findOne({ where: { id: studentTemp.userId } });
+            console.log(student);
+            
             if (!certificate) return null;
             const certificateType = await this.certificateTypeRepo.findOne({ where: { id: certificate.certificateTypeId } });
-            return studentInfo ? { certificate, studentInfo, certificateType } : null;
+            
+            return teacherInfo ? { certificate, teacherInfo, certificateType, student } : null;
         })
     );
 
