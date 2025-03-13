@@ -121,7 +121,7 @@ export class CertificateService {
     return result;
   }
 
-  async getTeacherCertificate() {
+  async getTeacherCertificateType() {
     const result = await this.userCertificateTypeRepo.find();
   
     const result2 = await Promise.all(
@@ -139,7 +139,18 @@ export class CertificateService {
   
     return result2;
   }
+
+  async getTeacherCertificateTypeDetail(teacherId: string, certificateTypeId: string) {
+    const result: any = await this.userCertificateTypeRepo.find({
+      where: { userId: teacherId, certificateTypeId },
+    });
   
+    const user = await this.userService.findOne({ where: { id: result.userId } });
+
+    const certificate = await this.certificateTypeRepo.findOne({ where: { id: result.certificateTypeId } });
+  
+    return {user, certificate};
+  }
 
   async createCertificate(teacherId: string, dto: CreateCertificateDto): Promise<CertificateEntity> {
     const { userId, ...certificateData } = dto;
