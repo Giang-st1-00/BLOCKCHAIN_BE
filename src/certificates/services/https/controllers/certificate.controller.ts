@@ -14,15 +14,16 @@ import { TeacherCertificateDto } from '../dto/teacher-certificate.dto';
 export class CertificateController {
   constructor(private readonly certificateService: CertificateService) {}
 
-  // @Post('issue')
-  // @ApiParam({ name: 'id', type: String, description: 'User ID' })
-  // @ApiBody({ type: IssueCertificateDto })
-  // async issueCertificate(
-  //   @Param('id') userId: string, 
-  //   @Body() data: { name: string; score: number; recipient: string }
-  // ) {
-  //   return this.certificateService.issueCertificate(userId, data.name, data.score, data.recipient);
-  // }
+  @Post(':id')
+@ApiParam({ name: 'id', type: String, description: 'User ID' })
+@ApiBody({ type: IssueCertificateDto })
+async issueCertificate(
+    @Param('id') userId: string, 
+    @Body() data: { name: string; code: string; subject: string; recipient: string }
+) {
+    return this.certificateService.issueCertificate(userId, data.name, data.code, data.subject, data.recipient);
+}
+
 
   @Get('studentByType/:certificateTypeId')
   @ApiOperation({ description: `Get all student in certificate` })

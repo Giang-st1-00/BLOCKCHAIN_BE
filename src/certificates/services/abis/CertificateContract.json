@@ -22,9 +22,15 @@
 			},
 			{
 				"indexed": false,
-				"internalType": "uint256",
-				"name": "score",
-				"type": "uint256"
+				"internalType": "string",
+				"name": "code",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "subject",
+				"type": "string"
 			},
 			{
 				"indexed": false,
@@ -44,9 +50,14 @@
 				"type": "string"
 			},
 			{
-				"internalType": "uint256",
-				"name": "_score",
-				"type": "uint256"
+				"internalType": "string",
+				"name": "_code",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_subject",
+				"type": "string"
 			},
 			{
 				"internalType": "address",
@@ -81,9 +92,14 @@
 				"type": "string"
 			},
 			{
-				"internalType": "uint256",
-				"name": "score",
-				"type": "uint256"
+				"internalType": "string",
+				"name": "code",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "subject",
+				"type": "string"
 			},
 			{
 				"internalType": "address",
@@ -120,9 +136,14 @@
 				"type": "string"
 			},
 			{
-				"internalType": "uint256",
+				"internalType": "string",
 				"name": "",
-				"type": "uint256"
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
 			},
 			{
 				"internalType": "address",

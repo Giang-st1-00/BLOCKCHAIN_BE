@@ -18,7 +18,7 @@ import { UserCertificateTypeEntity } from '~users/entities/user-certificate-type
 export class CertificateService {
   private web3: Web3;
   private contract: any;
-  private contractAddress = '0xb5D2A707367d45596e372Ec3371F7BE12c3faEbD';
+  private contractAddress = '0x51f315B54fc76B62c4DeA5ea8B4d1A2a143fB387';
 
   constructor(
     private readonly userService: UserService,
@@ -38,63 +38,61 @@ export class CertificateService {
     this.contract = new this.web3.eth.Contract(contractAbi, this.contractAddress);
   }
 
-  // async issueCertificate(userId: string, name: string, recipient: string) {
-  //   const user = await this.userService.findOne({ where: { id: userId } });
+  async issueCertificate(userId: string, name: string, code: string, subject: string, recipient: string) {
+    const user = await this.userService.findOne({ where: { id: userId } });
+    
 
-  //   if (!user) {
-  //     throw new Error('User not found');
-  //   }
+    if (!user) {
+        throw new Error('User not found');
+    }
 
-  //   await this.certificateRepo.save({
-      
-  //     recipient,
-  //   });
+    const account = user.walletAddress;
+    const privateKey = user.walletPrivateKey.startsWith('0x')
+        ? user.walletPrivateKey
+        : '0x' + user.walletPrivateKey;
 
-  //   const account = user.walletAddress;
-  //   const privateKey = user.walletPrivateKey.startsWith('0x') 
-  //   ? user.walletPrivateKey 
-  //   : '0x' + user.walletPrivateKey;
+    if (!account || !privateKey) {
+        throw new Error('User account or private key is missing');
+    }
 
-  //   if (!account || !privateKey) {
-  //     throw new Error('User account or private key is missing');
-  //   }
+    this.web3.eth.accounts.wallet.add(privateKey);
+    console.log(name, code, subject, recipient);
+    const tx = this.contract.methods.issueCertificate(name, code, subject, this.web3.utils.toChecksumAddress(recipient));
 
-  //   this.web3.eth.accounts.wallet.add(privateKey);
+    const gas = await tx.estimateGas({ from: account });
+    const gasPrice = await this.web3.eth.getGasPrice();
 
-  //   const tx = this.contract.methods.issueCertificate(name, recipient);
+    const txData = {
+        from: account,
+        to: this.contractAddress,
+        data: tx.encodeABI(),
+        gas,
+        gasPrice,
+    };
 
-  //   const gas = await tx.estimateGas({ from: account });
-  //   const gasPrice = await this.web3.eth.getGasPrice();
+    const signedTx = await this.web3.eth.accounts.signTransaction(txData, privateKey);
+    const receipt = await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
-  //   const txData = {
-  //     from: account,
-  //     to: this.contractAddress,
-  //     data: tx.encodeABI(),
-  //     gas,
-  //     gasPrice,
-  //   };
+    console.log(receipt.logs);
 
-  //   const signedTx = await this.web3.eth.accounts.signTransaction(txData, privateKey);
-  //   const receipt = await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+    let certId: string | null = null;
+    if (receipt.logs && receipt.logs.length > 0) {
+        const eventLog = receipt.logs.find(log => log?.address?.toLowerCase() === this.contractAddress.toLowerCase());
+        if (eventLog && eventLog.data) {
+            const hexData = this.web3.utils.bytesToHex(eventLog.data);
+            certId = this.web3.eth.abi.decodeParameter('string', hexData) as string;
+        }
+    }
 
-  //   console.log(receipt.logs);
+    return {
+        certId,
+        transactionHash: receipt.transactionHash,
+        gasUsed: receipt.gasUsed.toString(),
+        cumulativeGasUsed: receipt.cumulativeGasUsed.toString(),
+    };
+}
 
-  //   let certId: string | null = null;
-  //   if (receipt.logs && receipt.logs.length > 0) {
-  //     const eventLog = receipt.logs.find(log => log?.address?.toLowerCase() === this.contractAddress.toLowerCase());
-  //     if (eventLog && eventLog.data) {
-  //       const hexData = this.web3.utils.bytesToHex(eventLog.data);
-  //       certId = this.web3.eth.abi.decodeParameter('string', hexData) as string;
-  //     }
-  //   }
 
-  //   return {
-  //     certId,
-  //     transactionHash: receipt.transactionHash,
-  //     gasUsed: receipt.gasUsed.toString(),
-  //     cumulativeGasUsed: receipt.cumulativeGasUsed.toString(),
-  //   };
-  // }
 
   async verifyCertificate(certId: string) {
     const result = await this.contract.methods.verifyCertificate(certId).call();
