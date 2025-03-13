@@ -7,7 +7,7 @@ export class TeacherCertificateDto {
   @ApiPropertyOptional({ example: "909f6672-fa26-4210-9399-8f9e5baa200c" })
   @IsOptional()
   @IsString({ each: true })
-  certificateId: string;
+  certificateTypeId: string;
 
   @ApiPropertyOptional({ example: "909f6672-fa26-4210-9399-8f9e5baa200c" })
   @IsOptional()

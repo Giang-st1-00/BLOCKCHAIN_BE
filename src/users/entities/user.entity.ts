@@ -3,6 +3,8 @@ import { BaseEntity } from "~core/entities/base.entity";
 import { UserRoleEnum } from '~users/enums/user-role.enum';
 import { UserCertificateEntity } from './user-certificate.entity';
 import { CertificateEntity } from '~certificates/entities/certificate.entity';
+import { UserCertificateTypeEntity } from './user-certificate-type.entity';
+import { CertificateTypeEntity } from '~certificates/entities/certificate-type.entity';
 
 
 @Entity('User')
@@ -57,4 +59,14 @@ export class UserEntity extends BaseEntity {
         synchronize: false
     })
     certificates: CertificateEntity[];
+
+    @OneToMany(() => UserCertificateTypeEntity, (userCertificateType) => userCertificateType.user)
+    userCertificatesType: UserCertificateTypeEntity[];
+
+    @ManyToMany(() => CertificateTypeEntity, (certificateType) => certificateType.users)
+    @JoinTable({
+        name: 'UserCetificateType',
+        synchronize: false
+    })
+    certificatesType: CertificateEntity[];
 }

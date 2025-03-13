@@ -7,9 +7,10 @@ import { UserEntity } from "~users/entities/user.entity";
 import { UserService } from "~users/services/user.service";
 import { CertificateTypeEntity } from "./entities/certificate-type.entity";
 import { UserCertificateEntity } from "~users/entities/user-certificate.entity";
+import { UserCertificateTypeEntity } from "~users/entities/user-certificate-type.entity";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([CertificateEntity, UserEntity, CertificateTypeEntity, UserCertificateEntity])],
+    imports: [TypeOrmModule.forFeature([CertificateEntity, UserEntity, CertificateTypeEntity, UserCertificateEntity, UserCertificateTypeEntity])],
     controllers: [CertificateController],
     providers: [CertificateService, UserService],
     exports: []

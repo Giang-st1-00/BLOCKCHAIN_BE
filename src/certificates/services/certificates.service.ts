@@ -12,6 +12,7 @@ import { CreateCertificateDto } from './https/dto/create-certificate.dto';
 import { UserCertificateEntity } from '~users/entities/user-certificate.entity';
 import { CertificateResponse } from './https/responses/certificate.response';
 import { UserRoleEnum } from '~users/enums/user-role.enum';
+import { UserCertificateTypeEntity } from '~users/entities/user-certificate-type.entity';
 
 @Injectable()
 export class CertificateService {
@@ -28,6 +29,8 @@ export class CertificateService {
     private readonly certificateTypeRepo: Repository<CertificateTypeEntity>,
     @InjectRepository(UserCertificateEntity)
     private readonly userCertificateRepo: Repository<UserCertificateEntity>,
+    @InjectRepository(UserCertificateTypeEntity)
+    private readonly userCertificateTypeRepo: Repository<UserCertificateTypeEntity>,
     @InjectRepository(UserEntity) 
     private readonly userRepo: Repository<UserEntity>,
   ) {
@@ -107,22 +110,25 @@ export class CertificateService {
   }
 
   async createTeacherCertificate(teacherCertificateDto: any) {
-    const { userId, certificateId } = teacherCertificateDto;
-    const result = await this.userCertificateRepo.save({
+    const { userId, certificateTypeId } = teacherCertificateDto;
+    console.log(userId, certificateTypeId);
+    
+    const result = await this.userCertificateTypeRepo.save({
       userId,
-      certificateId,
+      certificateTypeId,
     });
+
     return result;
   }
 
   async getTeacherCertificate() {
-    const result = await this.userCertificateRepo.find();
+    const result = await this.userCertificateTypeRepo.find();
   
     const result2 = await Promise.all(
       result.map(async (item) => {
         const user = await this.userService.findOne({ where: { id: item.userId } });
   
-        const certificate = await this.certificateRepo.findOne({ where: { id: item.certificateId } });
+        const certificate = await this.certificateTypeRepo.findOne({ where: { id: item.certificateTypeId } });
   
         return {
           user,
