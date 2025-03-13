@@ -4,4 +4,5 @@ export type SignUpResultType = {
     refreshToken: string;
     expireAt: number;
     role: string;
+    code: string;
 };

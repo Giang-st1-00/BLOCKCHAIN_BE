@@ -50,6 +50,7 @@ export class AuthService {
 
         return {
             id,
+            code,
             role,
             token,
             refreshToken,
