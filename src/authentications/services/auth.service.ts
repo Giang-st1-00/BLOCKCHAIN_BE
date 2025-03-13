@@ -40,7 +40,7 @@ export class AuthService {
 
     async createAuthResult(user: UserEntity, code: string): Promise<SignUpResultType> {
         const payload: JwtPayloadType = { id: user.id, code };
-        const {role} = user;
+        const {role, id} = user;
 
         const [token, refreshToken] = await Promise.all([
             this.jwtService.signAsync(payload),
@@ -49,6 +49,7 @@ export class AuthService {
         const { exp: expireAt } = await this.jwtService.decode(token);
 
         return {
+            id,
             role,
             token,
             refreshToken,

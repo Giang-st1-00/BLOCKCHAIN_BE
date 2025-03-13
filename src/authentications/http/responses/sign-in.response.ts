@@ -44,4 +44,11 @@ export class SignInResponse {
     @IsNotEmpty()
     @IsString()
     role: string;
+
+    @ApiProperty({
+        example: "b1b2b3b4b5b6b7b8b9b0"
+    })
+    @IsNotEmpty()
+    @IsString()
+    id: string;
 }
