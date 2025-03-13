@@ -97,21 +97,15 @@ async issueCertificate(
     return this.certificateService.createCertificate(teacherId, createCertificateDto);
   }
 
-  @Get('/type/all')
+  @Get('type/all')
   @ApiOkResponse({ type: [CertificateTypeResponse] })
   async getCertificate() {
     return this.certificateService.getAllCertificateType();
   }
 
-  @Post('/type')
-  @ApiOperation({ description: `Create certificate type` })
-  @ApiOkResponse({ type: CertificateTypeResponse })
-  @HttpCode(HttpStatus.CREATED)
-  createType(@Body() createCertificateTypeDto: CreateCertificateTypeDto): Promise<CertificateTypeResponse> {
-      return this.certificateService.createCertificateType(createCertificateTypeDto)
-  }
+ 
 
-  @Delete('/type/:id')
+  @Delete('type/:id')
   @ApiOperation({ description: `Delete certificate` })
   @ApiOkResponse({ type: SuccessResponse })
   @HttpCode(HttpStatus.OK)
@@ -127,5 +121,11 @@ async issueCertificate(
   //   return this.certificateService.getCertificates();
   // }
   
-
+  @Post('type/create')
+  @ApiOperation({ description: `Create certificate type` })
+  @ApiOkResponse({ type: CertificateTypeResponse })
+  @HttpCode(HttpStatus.CREATED)
+  createType(@Body() createCertificateTypeDto: CreateCertificateTypeDto): Promise<CertificateTypeResponse> {
+      return this.certificateService.createCertificateType(createCertificateTypeDto)
+  }
 }

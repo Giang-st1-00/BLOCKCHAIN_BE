@@ -288,6 +288,8 @@ async getStudentByType(certificateTypeId: string): Promise<any> {
   }
 
   createCertificateType(entity: DeepPartial<CertificateTypeEntity>, options?: SaveOptions): Promise<CertificateTypeEntity> {
+      console.log(123123);
+      
       return this.certificateTypeRepo.save(entity, options);
   }
 
