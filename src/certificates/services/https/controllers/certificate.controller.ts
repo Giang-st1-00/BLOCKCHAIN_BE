@@ -23,6 +23,14 @@ export class CertificateController {
   //   return this.certificateService.issueCertificate(userId, data.name, data.score, data.recipient);
   // }
 
+  @Get('studentByType/:certificateTypeId')
+  @ApiOperation({ description: `Get all student in certificate` })
+  @ApiOkResponse({ type: [CertificateResponse] })
+  @ApiParam({ name: 'certificateTypeId', type: String, description: 'Certificate Type' })
+  async getStudentByType(@Param('certificateTypeId') certificateTypeId: string) {
+    return this.certificateService.getStudentByType(certificateTypeId);
+  }
+
   @Get('verify/:certId')
   async verifyCertificate(@Param('certId') certId: string) {
     return this.certificateService.verifyCertificate(certId);

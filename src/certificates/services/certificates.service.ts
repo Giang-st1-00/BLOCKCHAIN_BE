@@ -205,6 +205,25 @@ async getCertificateByStudentId(studentId: string): Promise<any> {
   return certificates.filter((c) => c !== null);
 }
 
+async getStudentByType(certificateTypeId: string): Promise<any> {
+  const certificates = await this.certificateRepo.find({
+    where: { certificateTypeId: certificateTypeId },
+  });
+
+
+  const certificateIds = certificates.map((uc) => uc.id);
+
+  const studentIds = await this.userCertificateRepo.find({
+    where: { certificateId: In(certificateIds) },
+  });
+
+  const studentInfo = await this.userRepo.find({
+    where: { id: In(studentIds.map((s) => s.userId)), role: UserRoleEnum.STUDENT },
+  });
+
+  return studentInfo;
+}
+
 
 
 
