@@ -140,12 +140,12 @@ export class CertificateService {
     return result2;
   }
 
-  async getTeacherCertificateTypeDetail(teacherId: string, certificateTypeId: string) {
+  async getTeacherCertificateTypeDetail(certificateTypeId: string) {
     const result: any = await this.userCertificateTypeRepo.find({
-      where: { userId: teacherId, certificateTypeId },
+      where: { certificateTypeId },
     });
   
-    const user = await this.userService.findOne({ where: { id: result.userId } });
+    const user = await this.userService.findOne({ where: { id: result.userId, role: UserRoleEnum.TEACHER } });
 
     const certificate = await this.certificateTypeRepo.findOne({ where: { id: result.certificateTypeId } });
   

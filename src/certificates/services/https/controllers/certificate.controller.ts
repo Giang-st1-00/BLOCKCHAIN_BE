@@ -68,12 +68,11 @@ export class CertificateController {
     return this.certificateService.getTeacherCertificateType();
   }
 
-  @Get('teacherCertificate/:teacherId/:certificateTypeId')
+  @Get('teacherCertificate/:certificateTypeId')
   @ApiOperation({ description: `Get all teacher certificate` })
   @ApiOkResponse({ type: [CertificateResponse] })
-  @ApiParam({ name: 'teacherId', type: String, description: 'Teacher ID' })
-  async getTeacherCertificateDetail(@Param('teacherId') teacherId: string, @Param('certificateTypeId') certificateTypeId: string) {
-    return this.certificateService.getTeacherCertificateTypeDetail(teacherId, certificateTypeId);
+  async getTeacherCertificateDetail(@Param('certificateTypeId') certificateTypeId: string) {
+    return this.certificateService.getTeacherCertificateTypeDetail(certificateTypeId);
   }
 
   @Post('teacherCertificate')
