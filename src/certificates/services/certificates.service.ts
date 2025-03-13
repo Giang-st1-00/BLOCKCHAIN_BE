@@ -152,37 +152,38 @@ export class CertificateService {
     return {user, certificate};
   }
 
-  async createCertificate(teacherId: string, dto: CreateCertificateDto): Promise<CertificateEntity> {
-    const { userId, ...certificateData } = dto;
-    
-    const certificateType = await this.certificateTypeRepo.findOne({ where: { id: certificateData.certificateTypeId } });
-    if (!certificateType) {
-        throw new Error('Certificate type not found');
+  async createCertificate(teacherId: string, dto: CreateCertificateDto): Promise<any> {
+    const { users, certificateTypeId, status } = dto;
+
+    if (!Array.isArray(users) || users.length === 0) {
+        throw new Error("Users array is empty or invalid.");
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    for (const user of users) {
 
-    try {
-        // Lưu certificate trước
-        const certificate = await queryRunner.manager.save(CertificateEntity, certificateData);
+        if (!user.id) {
+            throw new Error(`Invalid user ID: ${JSON.stringify(user)}`);
+        }
 
-        // Lưu vào bảng trung gian UserCetificate
-        await queryRunner.manager.save(UserCertificateEntity, {
-          userId,
-          certificateId: certificate.id,
+        const certificate = await this.certificateRepo.save({
+            certificateTypeId,
+            status,
         });
 
-        await queryRunner.commitTransaction();
-        return certificate;
-    } catch (error) {
-        await queryRunner.rollbackTransaction();
-        throw error;
-    } finally {
-        await queryRunner.release();
+        await this.userCertificateRepo.save({
+            userId: user.id,
+            certificateId: certificate.id,
+        });
+
+        await this.userCertificateRepo.save({
+            userId: teacherId,
+            certificateId: certificate.id,
+        });
     }
-  }
+
+    return { message: "Certificate created successfully" };
+}
+
 
   async getCertificateByTeacherId(teacherId: string): Promise<any[]> {
     // Tìm danh sách chứng chỉ liên quan đến giáo viên
