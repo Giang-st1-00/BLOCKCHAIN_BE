@@ -76,7 +76,7 @@ async issueCertificate(
     return this.certificateService.getTeacherCertificateTypeDetail(certificateTypeId);
   }
 
-  @Post('teacherCertificate')
+  @Post('teacherCertificate/create')
   @ApiOperation({ description: `Create table certificate and teacher` })
   @ApiOkResponse({ type: CertificateResponse })
   @ApiBody({ type: TeacherCertificateDto })
