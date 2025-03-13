@@ -176,6 +176,36 @@ export class CertificateService {
     return students.filter(Boolean);
 }
 
+async getCertificateByStudentId(studentId: string): Promise<any> {
+  const certificateStudent = await this.userCertificateRepo.find({
+    where: { userId: studentId },
+  });
+
+  const certificateIds = certificateStudent.map((c) => c.certificateId);
+
+  // Dùng Promise.all để chờ tất cả các promise hoàn thành
+  const certificates = await Promise.all(
+    certificateIds.map(async (certificateId: string) => {
+      const certificate = await this.certificateRepo.findOneBy({ id: certificateId });
+
+      if (!certificate) return null;
+
+      const certificateType = await this.certificateTypeRepo.findOneBy({
+        id: certificate.certificateTypeId,
+      });
+
+      return {
+        ...certificate,
+        certificateType,
+      };
+    })
+  );
+
+  // Lọc ra những phần tử null (trường hợp không tìm thấy certificate)
+  return certificates.filter((c) => c !== null);
+}
+
+
 
 
   async getAllCertificateType() {

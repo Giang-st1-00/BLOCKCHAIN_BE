@@ -28,12 +28,20 @@ export class CertificateController {
     return this.certificateService.verifyCertificate(certId);
   }
 
-  @Get('teacher:teacherId')
+  @Get('teacher/:teacherId')
   @ApiOperation({ description: `Get all certificates of teacher` })
   @ApiOkResponse({ type: [CertificateResponse] })
   @ApiParam({ name: 'teacherId', type: String, description: 'Teacher ID' })
   async getCertificateByTeacherId(@Param('teacherId') teacherId: string) {
     return this.certificateService.getCertificateByTeacherId(teacherId);
+  }
+
+  @Get('student/:studentId')
+  @ApiOperation({ description: `Get all certificates of student` })
+  @ApiOkResponse({ type: [CertificateResponse] })
+  @ApiParam({ name: 'studentId', type: String, description: 'Student ID' })
+  async getCertificateByStudentId(@Param('studentId') studentId: string) {
+    return this.certificateService.getCertificateByStudentId(studentId);
   }
 
   @Post('teacher/:teacherId')
