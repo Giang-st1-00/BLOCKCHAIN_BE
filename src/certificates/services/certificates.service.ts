@@ -106,6 +106,35 @@ export class CertificateService {
     return parsedResult;
   }
 
+  async createTeacherCertificate(teacherCertificateDto: any) {
+    const { userId, certificateId } = teacherCertificateDto;
+    const result = await this.userCertificateRepo.save({
+      userId,
+      certificateId,
+    });
+    return result;
+  }
+
+  async getTeacherCertificate() {
+    const result = await this.userCertificateRepo.find();
+  
+    const result2 = await Promise.all(
+      result.map(async (item) => {
+        const user = await this.userService.findOne({ where: { id: item.userId } });
+  
+        const certificate = await this.certificateRepo.findOne({ where: { id: item.certificateId } });
+  
+        return {
+          user,
+          certificate,
+        };
+      })
+    );
+  
+    return result2;
+  }
+  
+
   async createCertificate(teacherId: string, dto: CreateCertificateDto): Promise<CertificateEntity> {
     const { userId, ...certificateData } = dto;
     
@@ -127,12 +156,6 @@ export class CertificateService {
           userId,
           certificateId: certificate.id,
         });
-          await queryRunner.manager.save(UserCertificateEntity, {
-            userId: teacherId,
-            certificateId: certificate.id,
-        });
-
-
 
         await queryRunner.commitTransaction();
         return certificate;

@@ -8,6 +8,7 @@ import { DeleteResult } from 'typeorm';
 import { SuccessResponse } from '~core/http/responses/success.response';
 import { CreateCertificateTypeDto } from '../dto/create-certificate-type.dto';
 import { CertificateResponse } from '../responses/certificate.response';
+import { TeacherCertificateDto } from '../dto/teacher-certificate.dto';
 
 @Controller('certificate')
 export class CertificateController {
@@ -50,6 +51,30 @@ export class CertificateController {
   @ApiParam({ name: 'studentId', type: String, description: 'Student ID' })
   async getCertificateByStudentId(@Param('studentId') studentId: string) {
     return this.certificateService.getCertificateByStudentId(studentId);
+  }
+
+  // @Get('admin/:adminId')
+  // @ApiOperation({ description: `Get all certificates` })
+  // @ApiOkResponse({ type: [CertificateResponse] })
+  // @ApiParam({ name: 'adminId', type: String, description: 'Student ID' })
+  // async getCertificateByStudentId(@Param('adminId') adminId: string) {
+  //   return this.certificateService.getCertificateByStudentId(adminId);
+  // }
+
+  @Get('teacherCertificate')
+  @ApiOperation({ description: `Get all teacher certificate` })
+  @ApiOkResponse({ type: [CertificateResponse] })
+  async getTeacherCertificate() {
+    return this.certificateService.getTeacherCertificate();
+  }
+
+  @Post('teacherCertificate')
+  @ApiOperation({ description: `Create table certificate and teacher` })
+  @ApiOkResponse({ type: CertificateResponse })
+  @ApiBody({ type: TeacherCertificateDto })
+  @HttpCode(HttpStatus.CREATED)
+  createTeacherCertificate(@Body() teacherCertificateDto: TeacherCertificateDto): Promise<any> {
+    return this.certificateService.createTeacherCertificate(teacherCertificateDto);
   }
 
   @Post('teacher/:teacherId')
