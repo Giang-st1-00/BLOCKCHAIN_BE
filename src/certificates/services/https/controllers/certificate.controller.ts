@@ -24,6 +24,14 @@ async issueCertificate(
     return this.certificateService.issueCertificate(data.certificateId, userId, data.name, data.code, data.subject);
 }
 
+  @Get(':id')
+  @ApiOperation({ description: `Get details certificates` })
+  @ApiOkResponse({ type: CertificateResponse })
+  @ApiParam({ name: 'id', type: String, description: 'Certificate ID' })
+  async getCertificateById(@Param('id') id: string) {
+    return this.certificateService.getCertificateById(id);
+  }
+
 
   @Get('studentByType/:certificateTypeId')
   @ApiOperation({ description: `Get all student in certificate` })

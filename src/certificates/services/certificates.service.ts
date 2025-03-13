@@ -108,6 +108,11 @@ export class CertificateService {
     return parsedResult;
   }
 
+  async getCertificateById(id: string): Promise<any> {
+    return this.certificateRepo.findOne({ where: { id } }); // Đúng cú pháp cho TypeORM mới
+}
+
+
   async createTeacherCertificate(teacherCertificateDto: any) {
     const { userId, certificateTypeId } = teacherCertificateDto;
     console.log(userId, certificateTypeId);
