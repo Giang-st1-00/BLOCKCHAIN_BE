@@ -27,7 +27,13 @@ export class UserController {
         return this.userService.findByCode(code);
     }
 
-    
+    @Get('userId/:userId')
+    @ApiOperation({ description: `Get a user's profile by Id` })
+    @ApiOkResponse({ type: UserResponse })
+    @HttpCode(HttpStatus.OK)
+    getById(@Param('userId') userId: string): Promise<UserResponse | null> {
+        return this.userService.findByCode(userId);
+    }
 
     @Get('role/:role')
     @ApiOperation({ description: `Get user by role` })

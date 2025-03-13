@@ -56,10 +56,10 @@ export class UserService {
     }
 
     findByCode(
-        code: string,
+        userId: string,
     ): Promise<UserEntity | null> {
         return this.userRepo.findOneBy({
-            code
+            id: userId
         });
     }
 
