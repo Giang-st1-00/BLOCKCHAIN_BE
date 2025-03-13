@@ -140,7 +140,7 @@ export class CertificateService {
   }
 
   async getTeacherCertificateTypeDetail(certificateTypeId: string) {
-    const result: any = await this.userCertificateTypeRepo.find({
+    const result: any = await this.userCertificateTypeRepo.findOne({
       where: { certificateTypeId },
     });
   
