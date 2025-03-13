@@ -56,6 +56,14 @@ export class UserService {
     }
 
     findByCode(
+        code: string,
+    ): Promise<UserEntity | null> {
+        return this.userRepo.findOneBy({
+            code: code
+        });
+    }
+
+    findByuserId(
         userId: string,
     ): Promise<UserEntity | null> {
         return this.userRepo.findOneBy({

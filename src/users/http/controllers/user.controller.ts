@@ -32,7 +32,7 @@ export class UserController {
     @ApiOkResponse({ type: UserResponse })
     @HttpCode(HttpStatus.OK)
     getById(@Param('userId') userId: string): Promise<UserResponse | null> {
-        return this.userService.findByCode(userId);
+        return this.userService.findByuserId(userId);
     }
 
     @Get('role/:role')
