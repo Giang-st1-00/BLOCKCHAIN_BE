@@ -19,9 +19,9 @@ export class CertificateController {
 @ApiBody({ type: IssueCertificateDto })
 async issueCertificate(
     @Param('id') userId: string, 
-    @Body() data: { name: string; code: string; subject: string; recipient: string }
+    @Body() data: { certificateId: string, name: string; code: string; subject: string; }
 ) {
-    return this.certificateService.issueCertificate(userId, data.name, data.code, data.subject, data.recipient);
+    return this.certificateService.issueCertificate(data.certificateId, userId, data.name, data.code, data.subject);
 }
 
 

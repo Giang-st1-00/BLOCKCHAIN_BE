@@ -6,10 +6,6 @@ export class IssueCertificateDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ example: '0xD6557A2688Ab2cbA976ef4358F3001B0509E2D93', description: 'Địa chỉ ví của người nhận' })
-  @IsString()
-  recipient: string;
-
   @ApiProperty({ example: '123456', description: 'Mã chứng chỉ' })
   @IsString()
   code: string;
@@ -17,4 +13,8 @@ export class IssueCertificateDto {
   @ApiProperty({ example: 'Math', description: 'Môn học' })
   @IsString()
   subject: string;
+
+  @ApiProperty({ example: '1', description: 'ID của chứng chỉ' })
+  @IsString()
+  certificateId: string;
 }

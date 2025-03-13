@@ -13,6 +13,7 @@ import { UserCertificateEntity } from '~users/entities/user-certificate.entity';
 import { CertificateResponse } from './https/responses/certificate.response';
 import { UserRoleEnum } from '~users/enums/user-role.enum';
 import { UserCertificateTypeEntity } from '~users/entities/user-certificate-type.entity';
+import { CertificateStatusEnum } from '~certificates/enums/certificateStatus.enum';
 
 @Injectable()
 export class CertificateService {
@@ -38,10 +39,9 @@ export class CertificateService {
     this.contract = new this.web3.eth.Contract(contractAbi, this.contractAddress);
   }
 
-  async issueCertificate(userId: string, name: string, code: string, subject: string, recipient: string) {
+  async issueCertificate(certificateId: string, userId: string, name: string, code: string, subject: string) {
     const user = await this.userService.findOne({ where: { id: userId } });
     
-
     if (!user) {
         throw new Error('User not found');
     }
@@ -56,8 +56,7 @@ export class CertificateService {
     }
 
     this.web3.eth.accounts.wallet.add(privateKey);
-    console.log(name, code, subject, recipient);
-    const tx = this.contract.methods.issueCertificate(name, code, subject, this.web3.utils.toChecksumAddress(recipient));
+    const tx = this.contract.methods.issueCertificate(name, code, subject, this.web3.utils.toChecksumAddress(this.contractAddress));
 
     const gas = await tx.estimateGas({ from: account });
     const gasPrice = await this.web3.eth.getGasPrice();
@@ -84,6 +83,8 @@ export class CertificateService {
         }
     }
 
+    await this.certificateRepo.update(certificateId, { status: CertificateStatusEnum.APPROVED });
+    
     return {
         certId,
         transactionHash: receipt.transactionHash,
