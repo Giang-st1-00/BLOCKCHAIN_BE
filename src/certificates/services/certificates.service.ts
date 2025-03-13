@@ -198,7 +198,9 @@ export class CertificateService {
                 where: { id: sc.userId, role: UserRoleEnum.TEACHER },
             });
             const certificate = await this.certificateRepo.findOne({  where: { id: sc.certificateId } });
-            return studentInfo ? { certificate, studentInfo } : null;
+            if (!certificate) return null;
+            const certificateType = await this.certificateTypeRepo.findOne({ where: { id: certificate.certificateTypeId } });
+            return studentInfo ? { certificate, studentInfo, certificateType } : null;
         })
     );
 
