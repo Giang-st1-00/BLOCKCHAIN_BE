@@ -9,6 +9,12 @@ import { CertificateTypeEntity } from './certificate-type.entity';
 @Entity('Certificate')
 export class CertificateEntity extends BaseEntity {
     @Column({
+        type: 'varchar',
+        nullable: true
+    })
+    certId: string;
+
+    @Column({
         type: 'enum',
         enum: CertificateStatusEnum,
         enumName: 'CertificateStatusEnum',

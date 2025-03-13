@@ -70,23 +70,23 @@ export class CertificateService {
     };
 
     const signedTx = await this.web3.eth.accounts.signTransaction(txData, privateKey);
-    const receipt = await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+    const receipt: any = await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
     console.log(receipt.logs);
 
     let certId: string | null = null;
     if (receipt.logs && receipt.logs.length > 0) {
-        const eventLog = receipt.logs.find(log => log?.address?.toLowerCase() === this.contractAddress.toLowerCase());
+        const eventLog = receipt.logs.find((log: any) => log?.address?.toLowerCase() === this.contractAddress.toLowerCase());
         if (eventLog && eventLog.data) {
             const hexData = this.web3.utils.bytesToHex(eventLog.data);
             certId = this.web3.eth.abi.decodeParameter('string', hexData) as string;
         }
     }
 
-    await this.certificateRepo.update(certificateId, { status: CertificateStatusEnum.APPROVED });
-    
+    await this.certificateRepo.update(certificateId, { status: CertificateStatusEnum.APPROVED, certId: receipt.logs[0].topics[1] });
+
     return {
-        certId,
+        certId, 
         transactionHash: receipt.transactionHash,
         gasUsed: receipt.gasUsed.toString(),
         cumulativeGasUsed: receipt.cumulativeGasUsed.toString(),
