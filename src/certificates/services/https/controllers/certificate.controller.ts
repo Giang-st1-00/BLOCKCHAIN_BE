@@ -70,10 +70,12 @@ async issueCertificate(
   //   return this.certificateService.getCertificateByStudentId(adminId);
   // }
 
-  @Get('teacherCertificate')
+  @Get('/teacherCertificate111/all')
   @ApiOperation({ description: `Get all teacher certificate` })
   @ApiOkResponse({ type: [CertificateResponse] })
   async getTeacherCertificate() {
+    console.log('getTeacherCertificate');
+    
     return this.certificateService.getTeacherCertificateType();
   }
 

@@ -127,6 +127,8 @@ export class CertificateService {
 
   async getTeacherCertificateType() {
     const result = await this.userCertificateTypeRepo.find();
+    console.log(result);
+    
   
     const result2 = await Promise.all(
       result.map(async (item) => {
