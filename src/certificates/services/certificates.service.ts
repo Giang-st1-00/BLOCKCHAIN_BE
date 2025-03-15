@@ -112,6 +112,17 @@ export class CertificateService {
     return this.certificateRepo.findOne({ where: { id } }); // Đúng cú pháp cho TypeORM mới
 }
 
+async getCertificatesByName(nameType: string):  Promise<any> {
+  const certificateType =  await this.certificateTypeRepo.findOne({ where: { name: nameType } });
+
+  if (!certificateType) {
+    return [];
+  }
+  
+  return this.certificateRepo.find({ where: { certificateTypeId: certificateType.id } }); // Đúng cú pháp cho TypeORM mới
+}
+
+
 async getAllCertificate(): Promise<any> {
   return this.certificateRepo.find(); // Đúng cú pháp cho TypeORM mới
 }

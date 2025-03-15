@@ -54,6 +54,12 @@ export class CertificateController {
       return this.certificateService.createCertificateType(createCertificateTypeDto)
   }
 
+  @Get('type/:nameType')
+  @ApiOkResponse({ type: [CertificateTypeResponse] })
+  @ApiParam({ name: 'nameType', type: String, description: 'Certificate Type' })
+  async getCertificateByName(@Param('nameType') nameType: string) {
+    return this.certificateService.getCertificatesByName(nameType);
+  }
 
   @Delete('type/:id')
   @ApiOperation({ description: `Delete certificate` })
@@ -137,6 +143,8 @@ export class CertificateController {
     async getAllCertificate() {
       return this.certificateService.getAllCertificate();
     }
+
+
   
     @Get(':id')
     @ApiOperation({ description: `Get details certificates` })
