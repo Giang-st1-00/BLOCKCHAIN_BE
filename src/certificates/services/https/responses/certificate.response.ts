@@ -18,6 +18,10 @@ export class CertificateResponse extends BaseResponse {
     @IsNumber()
     score: number;
 
+    @ApiProperty({ example: "/uploads/1742028280167-563721209.jpeg" })
+    @IsNotEmpty()
+    image: string;
+
     @ApiPropertyOptional({ example: faker.string.uuid() })
     @IsOptional()
     @IsUUID('4')

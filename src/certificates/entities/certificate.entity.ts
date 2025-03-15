@@ -10,6 +10,11 @@ import { CertificateTypeEntity } from './certificate-type.entity';
 export class CertificateEntity extends BaseEntity {
     @Column({
         type: 'varchar',
+    })
+    image: string;
+
+    @Column({
+        type: 'varchar',
         nullable: true
     })
     certId: string;
