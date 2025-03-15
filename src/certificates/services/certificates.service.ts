@@ -164,15 +164,14 @@ export class CertificateService {
 
     for (const user of users) {
 
-        if (!user.id || !user.score || !user.image) {
+        if (!user.id || !user.score) {
             throw new Error(`thieu id hoac score`);
         }
 
         const certificate = await this.certificateRepo.save({
             certificateTypeId,
             status,
-            score: user.score,
-            image: user.image
+            score: user.score
         });
 
         await this.userCertificateRepo.save({
