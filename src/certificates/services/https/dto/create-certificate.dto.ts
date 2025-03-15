@@ -4,6 +4,7 @@ import { IsString, IsNumber, IsEnum, IsNotEmpty, IsOptional, IsUUID, ArrayNotEmp
 import { CertificateStatusEnum } from '~certificates/enums/certificateStatus.enum';
 interface User {
   id: string;
+  score: number;
 }
 
 export class CreateCertificateDto {
@@ -13,12 +14,12 @@ export class CreateCertificateDto {
   @IsEnum(CertificateStatusEnum)
   status: CertificateStatusEnum;
 
-  @ApiPropertyOptional({ example: faker.string.uuid() })
+  @ApiProperty({ example: faker.string.uuid() })
   @IsOptional()
   @IsUUID('4')
   certificateTypeId: string;
 
-  @ApiPropertyOptional({ example: [{ id: faker.string.uuid() }] })
+  @ApiProperty({ example: [{ id: faker.string.uuid(), score: 9 }] })
   @IsOptional()
   @ArrayNotEmpty()  
   users: User[];

@@ -14,76 +14,11 @@ import { TeacherCertificateDto } from '../dto/teacher-certificate.dto';
 export class CertificateController {
   constructor(private readonly certificateService: CertificateService) {}
 
-  @Post(':id')
-@ApiParam({ name: 'id', type: String, description: 'User ID' })
-@ApiBody({ type: IssueCertificateDto })
-async issueCertificate(
-    @Param('id') userId: string, 
-    @Body() data: { certificateId: string, name: string; code: string; subject: string; }
-) {
-    return this.certificateService.issueCertificate(data.certificateId, userId, data.name, data.code, data.subject);
-}
-
-  @Get(':id')
-  @ApiOperation({ description: `Get details certificates` })
-  @ApiOkResponse({ type: CertificateResponse })
-  @ApiParam({ name: 'id', type: String, description: 'Certificate ID' })
-  async getCertificateById(@Param('id') id: string) {
-    return this.certificateService.getCertificateById(id);
-  }
-
-
-  @Get('studentByType/:certificateTypeId')
-  @ApiOperation({ description: `Get all student in certificate` })
-  @ApiOkResponse({ type: [CertificateResponse] })
-  @ApiParam({ name: 'certificateTypeId', type: String, description: 'Certificate Type' })
-  async getStudentByType(@Param('certificateTypeId') certificateTypeId: string) {
-    return this.certificateService.getStudentByType(certificateTypeId);
-  }
-
-  @Get('verify/:certId')
-  async verifyCertificate(@Param('certId') certId: string) {
-    return this.certificateService.verifyCertificate(certId);
-  }
-
-  @Get('teacher/:teacherId')
-  @ApiOperation({ description: `Get all certificates of teacher` })
-  @ApiOkResponse({ type: [CertificateResponse] })
-  @ApiParam({ name: 'teacherId', type: String, description: 'Teacher ID' })
-  async getCertificateByTeacherId(@Param('teacherId') teacherId: string) {
-    return this.certificateService.getCertificateByTeacherId(teacherId);
-  }
-
-  @Get('student/:studentId')
-  @ApiOperation({ description: `Get all certificates of student` })
-  @ApiOkResponse({ type: [CertificateResponse] })
-  @ApiParam({ name: 'studentId', type: String, description: 'Student ID' })
-  async getCertificateByStudentId(@Param('studentId') studentId: string) {
-    return this.certificateService.getCertificateByStudentId(studentId);
-  }
-
-  // @Get('admin/:adminId')
-  // @ApiOperation({ description: `Get all certificates` })
-  // @ApiOkResponse({ type: [CertificateResponse] })
-  // @ApiParam({ name: 'adminId', type: String, description: 'Student ID' })
-  // async getCertificateByStudentId(@Param('adminId') adminId: string) {
-  //   return this.certificateService.getCertificateByStudentId(adminId);
-  // }
-
   @Get('/teacherCertificate111/all')
   @ApiOperation({ description: `Get all teacher certificate` })
   @ApiOkResponse({ type: [CertificateResponse] })
   async getTeacherCertificate() {
-    console.log('getTeacherCertificate');
-    
     return this.certificateService.getTeacherCertificateType();
-  }
-
-  @Get('teacherCertificate/:certificateTypeId')
-  @ApiOperation({ description: `Get all teacher certificate` })
-  @ApiOkResponse({ type: [CertificateResponse] })
-  async getTeacherCertificateDetail(@Param('certificateTypeId') certificateTypeId: string) {
-    return this.certificateService.getTeacherCertificateTypeDetail(certificateTypeId);
   }
 
   @Post('teacherCertificate/create')
@@ -95,25 +30,19 @@ async issueCertificate(
     return this.certificateService.createTeacherCertificate(teacherCertificateDto);
   }
 
-  @Post('teacher/:teacherId')
-  @ApiOperation({ description: `Create certificate` })
-  @ApiOkResponse({ type: CertificateTypeResponse })
-  @ApiParam({ name: 'teacherId', type: String, description: 'Teacher ID' })
-  @HttpCode(HttpStatus.CREATED)
-  create(
-    @Param('teacherId') teacherId: string, 
-    @Body() createCertificateDto: CreateCertificateDto
-  ): Promise<CertificateResponse> {
-    return this.certificateService.createCertificate(teacherId, createCertificateDto);
-  }
-
   @Get('type/all')
   @ApiOkResponse({ type: [CertificateTypeResponse] })
   async getCertificate() {
     return this.certificateService.getAllCertificateType();
   }
 
- 
+  @Post('type/create')
+  @ApiOperation({ description: `Create certificate type` })
+  @ApiOkResponse({ type: CertificateTypeResponse })
+  @HttpCode(HttpStatus.CREATED)
+  createType(@Body() createCertificateTypeDto: CreateCertificateTypeDto): Promise<CertificateTypeResponse> {
+      return this.certificateService.createCertificateType(createCertificateTypeDto)
+  }
 
   @Delete('type/:id')
   @ApiOperation({ description: `Delete certificate` })
@@ -123,19 +52,69 @@ async issueCertificate(
       return this.certificateService.deleteCertificateType(id)
   }
 
-  // @Get('/all')
-  // @ApiOperation({ description: `Get all users` })
-  // @ApiOkResponse({ type: , isArray: true })
-  // @HttpCode(HttpStatus.OK)
-  // async getCertificateByName() {
-  //   return this.certificateService.getCertificates();
-  // }
+    @Get('studentByType/:certificateTypeId')
+    @ApiOperation({ description: `Get all student in certificate` })
+    @ApiOkResponse({ type: [CertificateResponse] })
+    @ApiParam({ name: 'certificateTypeId', type: String, description: 'Certificate Type' })
+    async getStudentByType(@Param('certificateTypeId') certificateTypeId: string) {
+      return this.certificateService.getStudentByType(certificateTypeId);
+    }
   
-  @Post('type/create')
-  @ApiOperation({ description: `Create certificate type` })
-  @ApiOkResponse({ type: CertificateTypeResponse })
-  @HttpCode(HttpStatus.CREATED)
-  createType(@Body() createCertificateTypeDto: CreateCertificateTypeDto): Promise<CertificateTypeResponse> {
-      return this.certificateService.createCertificateType(createCertificateTypeDto)
-  }
+    @Get('verify/:certId')
+    async verifyCertificate(@Param('certId') certId: string) {
+      return this.certificateService.verifyCertificate(certId);
+    }
+  
+    @Get('teacher/:teacherId')
+    @ApiOperation({ description: `Get all certificates of teacher` })
+    @ApiOkResponse({ type: [CertificateResponse] })
+    @ApiParam({ name: 'teacherId', type: String, description: 'Teacher ID' })
+    async getCertificateByTeacherId(@Param('teacherId') teacherId: string) {
+      return this.certificateService.getCertificateByTeacherId(teacherId);
+    }
+  
+    @Get('student/:studentId')
+    @ApiOperation({ description: `Get all certificates of student` })
+    @ApiOkResponse({ type: [CertificateResponse] })
+    @ApiParam({ name: 'studentId', type: String, description: 'Student ID' })
+    async getCertificateByStudentId(@Param('studentId') studentId: string) {
+      return this.certificateService.getCertificateByStudentId(studentId);
+    }
+
+    @Get('teacherCertificate/:certificateTypeId')
+    @ApiOperation({ description: `Get all teacher certificate` })
+    @ApiOkResponse({ type: [CertificateResponse] })
+    async getTeacherCertificateDetail(@Param('certificateTypeId') certificateTypeId: string) {
+      return this.certificateService.getTeacherCertificateTypeDetail(certificateTypeId);
+    }
+
+    @Post('teacher/:teacherId')
+    @ApiOperation({ description: `Create certificate` })
+    @ApiOkResponse({ type: CertificateTypeResponse })
+    @ApiParam({ name: 'teacherId', type: String, description: 'Teacher ID' })
+    @HttpCode(HttpStatus.CREATED)
+    create(
+      @Param('teacherId') teacherId: string, 
+      @Body() createCertificateDto: CreateCertificateDto
+    ): Promise<CertificateResponse> {
+      return this.certificateService.createCertificate(teacherId, createCertificateDto);
+    }
+  
+    @Get(':id')
+    @ApiOperation({ description: `Get details certificates` })
+    @ApiOkResponse({ type: CertificateResponse })
+    @ApiParam({ name: 'id', type: String, description: 'Certificate ID' })
+    async getCertificateById(@Param('id') id: string) {
+      return this.certificateService.getCertificateById(id);
+    }
+
+    @Post(':id')
+    @ApiParam({ name: 'id', type: String, description: 'User ID' })
+    @ApiBody({ type: IssueCertificateDto })
+    async issueCertificate(
+        @Param('id') userId: string, 
+        @Body() data: { certificateId: string, name: string; code: string; subject: string; }
+    ) {
+        return this.certificateService.issueCertificate(data.certificateId, userId, data.name, data.code, data.subject);
+    }
 }

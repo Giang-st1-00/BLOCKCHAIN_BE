@@ -15,6 +15,12 @@ export class CertificateEntity extends BaseEntity {
     certId: string;
 
     @Column({
+        type: 'bigint',
+        default: 0
+    })
+    score: number;
+
+    @Column({
         type: 'enum',
         enum: CertificateStatusEnum,
         enumName: 'CertificateStatusEnum',

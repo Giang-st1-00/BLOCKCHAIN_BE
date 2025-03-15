@@ -115,7 +115,6 @@ export class CertificateService {
 
   async createTeacherCertificate(teacherCertificateDto: any) {
     const { userId, certificateTypeId } = teacherCertificateDto;
-    console.log(userId, certificateTypeId);
     
     const result = await this.userCertificateTypeRepo.save({
       userId,
@@ -127,8 +126,6 @@ export class CertificateService {
 
   async getTeacherCertificateType() {
     const result = await this.userCertificateTypeRepo.find();
-    console.log(result);
-    
   
     const result2 = await Promise.all(
       result.map(async (item) => {
@@ -167,13 +164,14 @@ export class CertificateService {
 
     for (const user of users) {
 
-        if (!user.id) {
-            throw new Error(`Invalid user ID: ${JSON.stringify(user)}`);
+        if (!user.id || !user.score) {
+            throw new Error(`thieu id hoac score`);
         }
 
         const certificate = await this.certificateRepo.save({
             certificateTypeId,
             status,
+            score: user.score
         });
 
         await this.userCertificateRepo.save({
@@ -215,12 +213,10 @@ export class CertificateService {
             const teacherInfo = await this.userRepo.findOne({
                 where: { id: sc.userId, role: UserRoleEnum.TEACHER },
             });
-            console.log(teacherInfo);
             
             const certificate = await this.certificateRepo.findOne({  where: { id: sc.certificateId } });
             const studentTemp:any = await this.userCertificateRepo.findOne({ where: { certificateId: sc.certificateId, userId: Not(sc.userId) } });
             const student  = await this.userRepo.findOne({ where: { id: studentTemp.userId } });
-            console.log(student);
             
             if (!certificate) return null;
             const certificateType = await this.certificateTypeRepo.findOne({ where: { id: certificate.certificateTypeId } });
