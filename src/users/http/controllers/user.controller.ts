@@ -1,10 +1,13 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, HttpCode, Put } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, HttpCode, Put, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UserService } from '~users/services/user.service';
 import { UserResponse } from '../responses/user.response';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { SuccessResponse } from '~core/http/responses/success.response';
 import { UserRoleEnum } from '~users/enums/user-role.enum';
+import { diskStorage } from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { extname } from 'path';
 
 @Controller('users')
 @ApiTags('Users')
@@ -43,6 +46,33 @@ export class UserController {
         return this.userService.getAll();
     }
 
+    @Post('uploadImage')
+    @ApiOperation({ description: `Upload an image file` })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary'
+                }
+            }
+        }
+    })
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+            destination: './uploads', // Lưu vào thư mục uploads
+            filename: (req, file, cb) => {
+                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+                cb(null, uniqueSuffix + extname(file.originalname));
+            }
+        })
+    }))
+    uploadFile(@UploadedFile() file: Express.Multer.File) {
+        return { filePath: `/uploads/${file.filename}` };
+    }
+
     @Put(':id')
     @ApiOperation({ description: 'Update a blog' })
     @ApiParam({ name: 'id', type: String })
@@ -61,6 +91,7 @@ export class UserController {
     delete(@Param('id') idUser: string): Promise<SuccessResponse> {
         return this.userService.delete(idUser);
     }
+    
 
     @Post()
     @ApiOperation({ description: `Create user` })

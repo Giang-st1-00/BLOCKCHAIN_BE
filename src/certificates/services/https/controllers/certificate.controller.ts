@@ -110,33 +110,7 @@ export class CertificateController {
       return this.certificateService.createCertificate(teacherId, createCertificateDto);
     }
 
-    @Post('uploadImage')
-    @ApiOperation({ description: `Upload an image file` })
-    @ApiConsumes('multipart/form-data')
-    @ApiBody({
-        schema: {
-            type: 'object',
-            properties: {
-                file: {
-                    type: 'string',
-                    format: 'binary'
-                }
-            }
-        }
-    })
-    @UseInterceptors(FileInterceptor('file', {
-        storage: diskStorage({
-            destination: './uploads', // Lưu vào thư mục uploads
-            filename: (req, file, cb) => {
-                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-                cb(null, uniqueSuffix + extname(file.originalname));
-            }
-        })
-    }))
-    uploadFile(@UploadedFile() file: Express.Multer.File) {
-        return { filePath: `/uploads/${file.filename}` };
-    }
-
+   
     @Get('all')
     @ApiOperation({ description: `Get all details certificates` })
     @ApiOkResponse({ type: [CertificateResponse] })

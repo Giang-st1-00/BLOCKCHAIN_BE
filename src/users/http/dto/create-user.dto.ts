@@ -5,6 +5,11 @@ import { UserRoleEnum } from '~users/enums/user-role.enum';
 import { Transform } from 'class-transformer';
 
 export class CreateUserDto {
+    @ApiProperty({ example: null })
+    @IsOptional()
+    @IsString()
+    image: string;
+
     @ApiProperty({ example: "21IT543" })
     @IsNotEmpty()
     @IsString()

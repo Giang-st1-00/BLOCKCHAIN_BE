@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEnum, IsNotEmpty } from "class-validator";
+import { IsEnum, IsNotEmpty, IsOptional } from "class-validator";
 import { BaseResponse } from "~core/http/responses/base.response";
 import { UserRoleEnum } from "~users/enums/user-role.enum";
 
@@ -8,6 +8,10 @@ export class UserResponse extends BaseResponse {
     @ApiProperty({ example: "21IT543" })
     @IsNotEmpty()
     code: string;
+
+    @ApiProperty({ example: "uploads/...." })
+    @IsOptional()
+    image: string;
 
     @ApiProperty({ example: "Le Truong Giang" })
     @IsNotEmpty()

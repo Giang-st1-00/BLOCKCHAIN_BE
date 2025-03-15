@@ -9,6 +9,12 @@ import { CertificateTypeEntity } from '~certificates/entities/certificate-type.e
 
 @Entity('User')
 export class UserEntity extends BaseEntity {
+    @Column({
+        type: 'varchar',
+        nullable: true 
+    })
+    image: string;
+
     @Unique('codeUserUnique', ['code'])
     @Column({
         type: 'varchar',
