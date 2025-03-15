@@ -9,9 +9,12 @@ import { corsConfig } from '~config/cors.config';
 import { env } from '~config/env.config';
 import { trimDataConfig } from '~config/trim-data.config';
 import { validationConfig } from '~config/validation.config';
+import * as express from 'express'; 
+import { join } from 'path';
 
 export class Bootstrap {
     private app: INestApplication;
+    
 
     async initApp(): Promise<void> {
         this.app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -21,6 +24,9 @@ export class Bootstrap {
             })
         );
         useContainer(this.app.select(AppModule), { fallbackOnErrors: true });
+
+        this.app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
+        console.log('Serving static files from:', join(__dirname, '..', 'uploads'));
     }
 
     initCors(): void {

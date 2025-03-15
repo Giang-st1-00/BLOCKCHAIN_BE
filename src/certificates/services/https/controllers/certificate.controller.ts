@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Param, HttpCode, HttpStatus, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, HttpCode, HttpStatus, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { CertificateService } from '~certificates/services/certificates.service';
 import { IssueCertificateDto } from '../dto/certificate.dto';
-import { ApiBody, ApiOkResponse, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { CertificateTypeResponse } from '../responses/certificate-type.response';
 import { CreateCertificateDto } from '../dto/create-certificate.dto';
 import { DeleteResult } from 'typeorm';
@@ -9,6 +9,9 @@ import { SuccessResponse } from '~core/http/responses/success.response';
 import { CreateCertificateTypeDto } from '../dto/create-certificate-type.dto';
 import { CertificateResponse } from '../responses/certificate.response';
 import { TeacherCertificateDto } from '../dto/teacher-certificate.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('certificate')
 export class CertificateController {
@@ -30,6 +33,13 @@ export class CertificateController {
     return this.certificateService.createTeacherCertificate(teacherCertificateDto);
   }
 
+  @Get('teacherCertificate/:certificateTypeId')
+  @ApiOperation({ description: `Get all teacher certificate` })
+  @ApiOkResponse({ type: [CertificateResponse] })
+  async getTeacherCertificateDetail(@Param('certificateTypeId') certificateTypeId: string) {
+    return this.certificateService.getTeacherCertificateTypeDetail(certificateTypeId);
+  }
+
   @Get('type/all')
   @ApiOkResponse({ type: [CertificateTypeResponse] })
   async getCertificate() {
@@ -43,6 +53,7 @@ export class CertificateController {
   createType(@Body() createCertificateTypeDto: CreateCertificateTypeDto): Promise<CertificateTypeResponse> {
       return this.certificateService.createCertificateType(createCertificateTypeDto)
   }
+
 
   @Delete('type/:id')
   @ApiOperation({ description: `Delete certificate` })
@@ -64,15 +75,7 @@ export class CertificateController {
     async verifyCertificate(@Param('certId') certId: string) {
       return this.certificateService.verifyCertificate(certId);
     }
-  
-    @Get('teacher/:teacherId')
-    @ApiOperation({ description: `Get all certificates of teacher` })
-    @ApiOkResponse({ type: [CertificateResponse] })
-    @ApiParam({ name: 'teacherId', type: String, description: 'Teacher ID' })
-    async getCertificateByTeacherId(@Param('teacherId') teacherId: string) {
-      return this.certificateService.getCertificateByTeacherId(teacherId);
-    }
-  
+
     @Get('student/:studentId')
     @ApiOperation({ description: `Get all certificates of student` })
     @ApiOkResponse({ type: [CertificateResponse] })
@@ -80,12 +83,13 @@ export class CertificateController {
     async getCertificateByStudentId(@Param('studentId') studentId: string) {
       return this.certificateService.getCertificateByStudentId(studentId);
     }
-
-    @Get('teacherCertificate/:certificateTypeId')
-    @ApiOperation({ description: `Get all teacher certificate` })
+  
+    @Get('teacher/:teacherId')
+    @ApiOperation({ description: `Get all certificates of teacher` })
     @ApiOkResponse({ type: [CertificateResponse] })
-    async getTeacherCertificateDetail(@Param('certificateTypeId') certificateTypeId: string) {
-      return this.certificateService.getTeacherCertificateTypeDetail(certificateTypeId);
+    @ApiParam({ name: 'teacherId', type: String, description: 'Teacher ID' })
+    async getCertificateByTeacherId(@Param('teacherId') teacherId: string) {
+      return this.certificateService.getCertificateByTeacherId(teacherId);
     }
 
     @Post('teacher/:teacherId')
@@ -98,6 +102,33 @@ export class CertificateController {
       @Body() createCertificateDto: CreateCertificateDto
     ): Promise<CertificateResponse> {
       return this.certificateService.createCertificate(teacherId, createCertificateDto);
+    }
+
+    @Post('uploadImage')
+    @ApiOperation({ description: `Upload an image file` })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary'
+                }
+            }
+        }
+    })
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+            destination: './uploads', // Lưu vào thư mục uploads
+            filename: (req, file, cb) => {
+                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+                cb(null, uniqueSuffix + extname(file.originalname));
+            }
+        })
+    }))
+    uploadFile(@UploadedFile() file: Express.Multer.File) {
+        return { filePath: `/uploads/${file.filename}` };
     }
   
     @Get(':id')
