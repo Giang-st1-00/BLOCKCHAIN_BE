@@ -11,14 +11,6 @@ import { UserRoleEnum } from '~users/enums/user-role.enum';
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @Get('all')
-    @ApiOperation({ description: `Get all users` })
-    @ApiOkResponse({ type: UserResponse, isArray: true })
-    @HttpCode(HttpStatus.OK)
-    getAll(): Promise<UserResponse[] | null> {
-        return this.userService.getAll();
-    }
-
     @Get('code/:code')
     @ApiOperation({ description: `Get a user's profile by Code` })
     @ApiOkResponse({ type: UserResponse })
@@ -43,12 +35,12 @@ export class UserController {
         return this.userService.getByRole(role);
     }
 
-    @Post()
-    @ApiOperation({ description: `Create user` })
-    @ApiOkResponse({ type: UserResponse })
-    @HttpCode(HttpStatus.CREATED)
-    create(@Body() createUserDto: CreateUserDto): Promise<UserResponse> {
-        return this.userService.create(createUserDto)
+    @Get('all')
+    @ApiOperation({ description: `Get all users` })
+    @ApiOkResponse({ type: UserResponse, isArray: true })
+    @HttpCode(HttpStatus.OK)
+    getAll(): Promise<UserResponse[] | null> {
+        return this.userService.getAll();
     }
 
     @Put(':id')
@@ -68,5 +60,13 @@ export class UserController {
     @ApiOkResponse({ type: SuccessResponse })
     delete(@Param('id') idUser: string): Promise<SuccessResponse> {
         return this.userService.delete(idUser);
+    }
+
+    @Post()
+    @ApiOperation({ description: `Create user` })
+    @ApiOkResponse({ type: UserResponse })
+    @HttpCode(HttpStatus.CREATED)
+    create(@Body() createUserDto: CreateUserDto): Promise<UserResponse> {
+        return this.userService.create(createUserDto)
     }
 }
