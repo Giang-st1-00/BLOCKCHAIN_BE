@@ -130,6 +130,13 @@ export class CertificateController {
     uploadFile(@UploadedFile() file: Express.Multer.File) {
         return { filePath: `/uploads/${file.filename}` };
     }
+
+    @Get('all')
+    @ApiOperation({ description: `Get all details certificates` })
+    @ApiOkResponse({ type: [CertificateResponse] })
+    async getAllCertificate() {
+      return this.certificateService.getAllCertificate();
+    }
   
     @Get(':id')
     @ApiOperation({ description: `Get details certificates` })
